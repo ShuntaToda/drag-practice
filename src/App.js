@@ -1,58 +1,61 @@
 import React from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import CategoryBody from "./CategoryBody";
 import { dummyData } from "./dummyData";
 
 function App() {
   console.log(dummyData);
   const onDragEnd = () => {};
+
   return (
-    <div className="container">
-      <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="container">
         {dummyData.map((board, boardIndex) => (
           <div className="card" key={board.id}>
             <h2 className="card-header ">{board.name}</h2>
-            <div className="card-body d-flex overflow-auto">
-              {/* カテゴリー */}
-              {board.categories.map((category, categoryIndex) => (
-                <div className="card" key={category.id}>
-                  <h3 className="card-header">{category.name}</h3>
-                  <Droppable droppableId={categoryIndex.toString()} type="task">
-                    {(provided, snapshot) => (
-                      <div
-                        className="card-body p-4"
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                      >
-                        {/* タスク */}
-                        {category.tasks.map((task, taskIndex) => (
-                          <Draggable
-                            key={task.id}
-                            draggableId={task.id.toString()}
-                            index={taskIndex}
-                          >
-                            {(provided, snapshot) => (
-                              <h4
-                                className="border p-3"
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                {task.name}
-                              </h4>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
+            {/* カテゴリー */}
+            <Droppable
+              droppableId={board.id.toString()}
+              type="category"
+              direction="horizontal"
+            >
+              {(provided, categorySnapshot) => (
+                <div
+                  className="card-body d-flex overflow-auto"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {board.categories.map((category, categoryIndex) => (
+                    <Draggable
+                      key={category.id}
+                      draggableId={category.id.toString()}
+                      index={categoryIndex}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          className="card"
+                          key={category.id}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <h3 className="card-header">{category.name}</h3>
+                          <CategoryBody
+                            categoryIndex={categoryIndex}
+                            category={category}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-              ))}
-            </div>
+              )}
+            </Droppable>
           </div>
         ))}
-      </DragDropContext>
-    </div>
+      </div>
+    </DragDropContext>
   );
 }
 
